@@ -483,8 +483,6 @@ def recommend_recipes_fasttext(data, user_input, fasttext_model, top_n=5):
     recommendations = data.nlargest(top_n, 'score')[['Title', 'Loves', 'score', 'ingredients']]
     return recommendations
 
-pip install googletrans==4.0.0-rc1
-
 from googletrans import Translator
 
 translator = Translator()
