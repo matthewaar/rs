@@ -87,7 +87,7 @@ merged_data.drop_duplicates(keep='first', inplace=True)
 ### Improved Handling Manual
 """
 
-import nltk
+
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
