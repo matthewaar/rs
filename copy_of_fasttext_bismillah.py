@@ -500,31 +500,27 @@ def detect_and_translate(user_input):
         translated_words = [translator.translate(word, src='en', dest='id').text for word in words]
         return ", ".join(translated_words)
 
-def main2():
+def main2(merged_data, selected_categories=None, user_allergens=None, user_ingredients=None):
     # Train FastText model
     all_tokens = merged_data['clean_tokens']
     fasttext_model = FastText(sentences=all_tokens, vector_size=100, window=5, min_count=1, workers=4)
 
     # Step 1: User selects categories
-    print("Available categories:", ', '.join(merged_data['kategori'].unique()))
-    selected_categories = input("Enter selected categories (comma-separated): ").split(',')
-    selected_categories = [cat.strip() for cat in selected_categories]
+    if not selected_categories:
+        raise ValueError("No categories selected!")
     filtered_data = filter_by_category(merged_data, selected_categories)
 
     # Step 2: User inputs allergens
-    user_allergens = input("Enter allergens to exclude (comma-separated): ")
-    user_allergens = detect_and_translate(user_allergens)  # Translate allergens if needed
-    user_allergens = [allergen.strip() for allergen in user_allergens.split(',')]
-    filtered_data = filter_by_allergens(filtered_data, user_allergens)
+    if user_allergens:
+        user_allergens = detect_and_translate(user_allergens)  # Translate allergens if needed
+        user_allergens = [allergen.strip() for allergen in user_allergens.split(',')]
+        filtered_data = filter_by_allergens(filtered_data, user_allergens)
 
     # Step 3: User inputs ingredients
-    user_ingredients = input("Enter ingredients you want to include (comma-separated): ")
+    if not user_ingredients:
+        raise ValueError("No ingredients entered!")
     user_ingredients = detect_and_translate(user_ingredients)  # Translate ingredients if needed
     recommendations = recommend_recipes_fasttext(filtered_data, user_ingredients, fasttext_model)
 
-    # Display recommendations
-    print("\nTop Recommended Recipes:")
-    for idx, row in recommendations.iterrows():
-        print(f"{idx + 1}. {row['Title']} (Score: {row['score']:.2f})")
-
-main2()
+    # Return recommendations
+    return recommendations
